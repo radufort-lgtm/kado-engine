@@ -1,0 +1,7 @@
+{
+  "name": "kado-engine",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "deno run --allow-net --allow-env index.ts"
+  }
+}
