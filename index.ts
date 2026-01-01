@@ -37,13 +37,13 @@ async function syncToKado() {
 
       if (!error) totalAdded++;
     }
+    // Pause to avoid hitting API limits
     await new Promise(resolve => setTimeout(resolve, 2000));
   }
   return totalAdded;
 }
 
-// 3. FIX: Dynamic Port Handling for Google Cloud Run
-// Google Cloud Run requires the server to listen on port 8080 by default.
+// 3. FIX: Listen on Port 8080 as required by Google Cloud
 const port = Number(Deno.env.get("PORT") || 8080);
 
 Deno.serve({ port, hostname: "0.0.0.0" }, async (req) => {
