@@ -1,9 +1,9 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-client@2.39.0';
 
-// 1. Get your keys from the Environment Variables we set in Google Cloud
-const SUPABASE_URL = Deno.env.get('https://hpgionzkpvplaeczhxza.supabase.co') || '';
-const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhwZ2lvbnprcHZwbGFlY3poeHphIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2NzE5MjA2OCwiZXhwIjoyMDgyNzY4MDY4fQ.vkoJVm3fh-fez66zazBEtD4ioEaS_0k4RgVRTjzddZs') || '';
-const YT_API_KEY = Deno.env.get('AIzaSyC_6GZQU4gNYpwk42eHHAL_5CPCavWqvjQ') || '';
+// 1. Correctly pull the NICKNAMES from your Google Cloud Environment Variables
+const SUPABASE_URL = Deno.env.get('SUPABASE_URL') || '';
+const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
+const YT_API_KEY = Deno.env.get('YT_API_KEY') || '';
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
@@ -37,13 +37,12 @@ async function syncToKado() {
 
       if (!error) totalAdded++;
     }
-    // Pause to avoid hitting API limits
     await new Promise(resolve => setTimeout(resolve, 2000));
   }
   return totalAdded;
 }
 
-// 3. FIX: Listen on Port 8080 as required by Google Cloud
+// 3. FIX: Listen on Port 8080 with the correct hostname for Google Cloud
 const port = Number(Deno.env.get("PORT") || 8080);
 
 Deno.serve({ port, hostname: "0.0.0.0" }, async (req) => {
