@@ -12,23 +12,17 @@ const GENRES = ["Phonk", "Lofi", "Hardstyle", "Ambient", "Drum and Bass"];
 
 async function findCleanMetadata(genre: string) {
   console.log(`🔍 Scout searching for official ${genre} hits...`);
-  
-  // This is where the engine calls YouTube to find official music videos 
-  // and artist data for the 92+ songs we talked about.
   const response = await fetch(
     `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${genre}+official+audio&type=video&videoCategoryId=10&maxResults=20&key=${YT_API_KEY}`
   );
-  
   const data = await response.json();
   return data.items || [];
 }
 
 async function syncToKado() {
   let totalAdded = 0;
-
   for (const genre of GENRES) {
     const tracks = await findCleanMetadata(genre);
-    
     for (const track of tracks) {
       const { error } = await supabase
         .from('alpha_tracks')
@@ -43,16 +37,16 @@ async function syncToKado() {
 
       if (!error) totalAdded++;
     }
-    
-    // Breathe for 2 seconds to avoid hitting YouTube API rate limits
     await new Promise(resolve => setTimeout(resolve, 2000));
   }
-
   return totalAdded;
 }
 
-// 3. The Server that runs when you hit the Google Cloud URL
-Deno.serve(async (req) => {
+// 3. FIX: Dynamic Port Handling for Google Cloud Run
+// Google Cloud Run requires the server to listen on port 8080 by default.
+const port = Number(Deno.env.get("PORT") || 8080);
+
+Deno.serve({ port, hostname: "0.0.0.0" }, async (req) => {
   try {
     const count = await syncToKado();
     return new Response(JSON.stringify({ status: "success", count }), {
